@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
   overdueText: {
     color: `#ff0000`,
     fontWeight: "bold",
+    fontSize: 10,
   },
 });
 
