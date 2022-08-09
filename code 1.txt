@@ -1,0 +1,26 @@
+
+
+
+        <View>
+                  <Button
+                    title="Play from 5s"
+                    onPress={() => video.current.playFromPositionAsync(5000)}
+                  ></Button>
+                  <Button
+                    title={status.isLooping ? "set to not loop" : "set to loop"}
+                    onPress={() =>
+                      video.current.setIsLoopingAsync(!status.isLooping)
+                    }
+                  ></Button>
+                </View>
+
+
+
+authentication/tests.py
+
+ <Calendar
+        initialDate={"2022-07-31"}
+        markingType={"multi-dot"}
+        hideDayNames={false}
+        markedDates={{ ...pendingobj, ...completedobj }}
+      ></Calendar>

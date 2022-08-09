@@ -1,0 +1,30 @@
+IEC 60364 - international standard
+
+Low voltage - BS7671 & NFC 15-11 - these standards talk more about secrity (saftey of the end users)not safety(for the personnel installing)
+
+\
+     <CategoryList title1="pending" result={filterByPending()}>
+        <List title="Today" result={filterbyDateandPending("Today")}></List>
+        <List
+          title="Tomorrow"
+          result={filterbyDateandPending("Tomorrow")}
+        ></List>
+        {p.map((element) => {
+          return (
+            <List title={`${element.datewords}`} result={[element]}></List>
+          );
+        })}
+      </CategoryList>
+      <CategoryList title1="complete" result={filterByComplete()}>
+        <List title="Today" result={filterbyDateandComplete("Today")}></List>
+        <List
+          title="Tomorrow"
+          result={filterbyDateandComplete("Tomorrow")}
+        ></List>
+        {p.map((element) => {
+          return (
+            <List title={`${element.datewords}`} result={[element]}></List>
+          );
+        })}
+      </CategoryList>
+
