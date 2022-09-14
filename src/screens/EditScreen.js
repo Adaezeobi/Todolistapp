@@ -1,11 +1,11 @@
 import React from "react";
 import TodoListForm from "../components/Todolistform";
 import ToDoContext from "../reducer/Context";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Text } from "react-native";
 
 const EditScreen = (navigation) => {
-  const { toDo, editBlogpost } = useContext(ToDoContext);
+  const { toDo, editBlogpost, gettoDo } = useContext(ToDoContext);
   const id = navigation.route.params.id;
   const toDoItem = toDo.find((toDo) => toDo.id === id);
   const initialValues = {
@@ -17,8 +17,9 @@ const EditScreen = (navigation) => {
     <TodoListForm
       initialvalues={initialValues}
       onSubmit={(title, description, date) => {
-        toDo.pop();
-        editBlogpost(title, description, date);
+        //toDo.pop();
+        editBlogpost(id, title, description, date, () => toDo.pop());
+
         navigation.navigation.navigate("To-Do List");
       }}
     ></TodoListForm>

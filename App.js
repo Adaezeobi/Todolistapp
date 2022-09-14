@@ -2,24 +2,26 @@ import * as React from "react";
 import { Button, Text, View, TouchableOpacity } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createAppContainer } from "react-navigation";
+import jsonServer from "./src/api/jsonServer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Entypo } from "@expo/vector-icons";
+import Moment from "moment";
 import { Ionicons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import CreateScreen from "./src/screens/CreateScreen";
 
-import Context from "./src/reducer/Context";
-import { useContext, useReducer } from "react";
+import { useContext, useReducer, useEffect } from "react";
 import ToDoContext from "./src/reducer/Context";
+import CalenderScreen from "./src/screens/CalenderScreen";
+import ModalScreen from "./src/screens/ModalScreen";
 
 import IndexScreen from "./src/screens/ListScreen";
 import HomeScreen from "./src/screens/HomeScreen";
 import EditScreen from "./src/screens/EditScreen";
 
 const dateformat = function (date, itemDate) {
-  const year = date.getFullYear();
-  const day = date.getDate();
+  const today = Moment(date).format("YYYY-MM-DD");
+  const tomorrow = Moment(date).add(1, "days").format("YYYY-MM-DD");
+
   const months = [
     "Jan",
     "Feb",
@@ -34,27 +36,14 @@ const dateformat = function (date, itemDate) {
     "Nov",
     "Dec",
   ];
-  const month =
-    date.getMonth() + 1 < 10
-      ? "" + 0 + (date.getMonth() + 1)
-      : date.getMonth() + 1;
 
-  const Today = `${year}-${month}-${day < 10 ? "" + 0 + day : day}`;
-  const Tomorrow = `${year}-${month}-${
-    day + 1 < 10 ? "" + 0 + (day + 1) : day + 1
-  }`;
-
-  console.log(Today);
-
-  if (itemDate === Today) {
+  if (itemDate === today) {
     return "Today";
   }
 
-  if (itemDate === Tomorrow) {
+  if (itemDate === tomorrow) {
     return "Tomorrow";
   } else {
-    //console.log(iterable);
-
     const iterable = itemDate.split("-");
 
     return `${
@@ -93,6 +82,7 @@ const reducer = (state, action) => {
           ...itemComp,
           completed: !itemComp.completed,
           icon: itemComp.completed ? "circle" : "check",
+          colors: itemComp.completed ? { color: "yellow" } : { color: "green" },
         },
         ...remaining,
       ];
@@ -114,6 +104,9 @@ const reducer = (state, action) => {
         },
       ];
 
+    case "get_Posts":
+      return action.payload;
+
     default:
       return state;
   }
@@ -133,28 +126,48 @@ function HomeStackScreen() {
           headerTitleStyle: { fontWeight: "bold" },
         }}
       />
+      <HomeStack.Screen
+        name="Calender"
+        component={CalenderScreen}
+        options={{
+          headerTintColor: "white",
+          headerStyle: { backgroundColor: `#db7093` },
+          headerTitleStyle: { fontWeight: "bold" },
+        }}
+      />
+      <HomeStack.Screen
+        name="Completed"
+        component={ModalScreen}
+        options={{
+          headerTintColor: "white",
+          headerStyle: { backgroundColor: `#db7093` },
+          headerTitleStyle: { fontWeight: "bold" },
+          headerBackVisible: false,
+        }}
+      />
     </HomeStack.Navigator>
   );
 }
 
 const IndexStack = createNativeStackNavigator();
 
-function IndexStackScreen() {
+function IndexStackScreen({ navigation }) {
   return (
     <IndexStack.Navigator>
       <IndexStack.Screen
         name="To-Do List"
         component={IndexScreen}
-        options={{
-          headerTintColor: "white",
-          headerStyle: { backgroundColor: `#db7093` },
-          headerTitleStyle: { fontWeight: "bold" },
-          headerRight: () => (
-            <TouchableOpacity>
-              <Feather name="more-horizontal" size={35} color="white" />
-            </TouchableOpacity>
-          ),
-        }}
+
+        //options={{
+        //headerTintColor: "white",
+        //headerStyle: { backgroundColor: `#db7093` },
+        //headerTitleStyle: { fontWeight: "bold" },
+        // headerRight: () => (
+        //  <TouchableOpacity>
+        //  <Feather name="more-horizontal" size={35} color="white" />
+        //</TouchableOpacity>
+        //),
+        //}}
       />
 
       <IndexStack.Screen
@@ -183,45 +196,74 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   const [toDo, dispatch] = useReducer(reducer, initialtoDo);
-  const addBlogpost = (title, Description, date) => {
-    dispatch({
-      type: "add",
+
+  const addBlogpost = async (title, Description, date) => {
+    await jsonServer.post("/posts", {
       title: title,
       description: Description,
-      id: Math.floor(Math.random() * 9999),
-      completed: false,
       date: date,
+      completed: false,
       icon: "circle",
+      colors: { color: "yellow" },
       datewords: dateformat(new Date(), date),
     });
-    console.log(toDo);
+    const response = await jsonServer.get("/posts");
+
+    dispatch({ type: "get_Posts", payload: response.data });
   };
 
-  const completedtoDO = (id) => {
+  const completedtoDO = async (id) => {
+    const itemComp = toDo.find((element) => {
+      return element.id === id;
+    });
+    await jsonServer.put(`/posts/${id}`, {
+      ...itemComp,
+      completed: !itemComp.completed,
+      icon: itemComp.completed ? "circle" : "check",
+      colors: itemComp.completed ? { color: "yellow" } : { color: "green" },
+    });
+    gettoDo();
     dispatch({ type: "complete", id: id });
+    //gettoDo();
   };
-
-  const deleteItem = (id) => {
+  const deleteItem = async (id) => {
+    await jsonServer.delete(`/posts/${id}`);
     dispatch({ type: "delete", id: id });
   };
 
-  const editBlogpost = (title, Description, date) => {
-    dispatch({
-      type: "edit",
+  const editBlogpost = async (id, title, Description, date, callback) => {
+    await jsonServer.put(`/posts/${id}`, {
       title: title,
       description: Description,
-      id: Math.floor(Math.random() * 9999),
-      completed: false,
       date: date,
+      completed: false,
       icon: "circle",
       datewords: dateformat(new Date(), date),
     });
-    //console.log(toDo);
+
+    gettoDo();
+    callback();
+  };
+
+  const gettoDo = async () => {
+    const response = await jsonServer.get("/posts");
+    const datas = response.data;
+    [...datas].forEach((d) => (d.datewords = dateformat(new Date(), d.date)));
+
+    //console.log(d);
+    dispatch({ type: "get_Posts", payload: datas });
   };
   return (
     <NavigationContainer>
       <ToDoContext.Provider
-        value={{ addBlogpost, toDo, completedtoDO, deleteItem, editBlogpost }}
+        value={{
+          addBlogpost,
+          toDo,
+          completedtoDO,
+          deleteItem,
+          editBlogpost,
+          gettoDo,
+        }}
       >
         <Tab.Navigator>
           <Tab.Screen

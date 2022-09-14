@@ -38,6 +38,7 @@ const TodoListForm = ({ navigation, onSubmit, initialvalues }) => {
             setDate(date);
           }}
           style={styles.DatePicker}
+          //mode={"datetime"}
         ></DatePicker>
       </View>
       <Text style={styles.ErrorMessage}> {error}</Text>
@@ -85,8 +86,6 @@ const styles = StyleSheet.create({
     // justifyContent: "center",
     flexDirection: "row",
     alignItems: "center",
-    //borderColor: "red",
-    //borderWidth: 5,
   },
   TitleInput: {
     borderWidth: 2,

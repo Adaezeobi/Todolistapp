@@ -1,5 +1,5 @@
 import React from "react";
-import { useContext, useState } from "react";
+import { useContext, useEffect } from "react";
 import ToDoContext from "../reducer/Context";
 import { Entypo } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -10,10 +10,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import Unorderedlist from "react-native-unordered-list";
-const List = ({ navigation, title, result }) => {
+
+const Pending = ({ navigation, title, result }) => {
   const { completedtoDO, deleteItem } = useContext(ToDoContext);
-  //console.log(result);
 
   return (
     <View>
@@ -29,8 +28,7 @@ const List = ({ navigation, title, result }) => {
                 <View style={styles.itemcontainer}>
                   <TouchableOpacity
                     onPress={() => {
-                      completedtoDO(item.id); //, console.log(item);
-                      //setIcon();
+                      completedtoDO(item.id);
                       console.log(item.id);
                     }}
                   >
@@ -67,22 +65,28 @@ const styles = StyleSheet.create({
     color: `#008080`,
     fontStyle: "italic",
   },
-  desclabel: { fontSize: 20 },
+  desclabel: { fontSize: 20, flexGrow: 1, flexWrap: "wrap" },
 
   rendercontainer: {
     flexDirection: "row",
     marginBottom: 15,
+    //flexGrow: 1,
+    flex: 1,
+    flexWrap: "wrap",
   },
 
   itemcontainer: {
     flexDirection: "row",
+
     justifyContent: "flex-start",
 
     borderBottomWidth: 1,
     flex: 1,
+    flexGrow: 1,
+    //flexWrap: "wrap",
   },
 
   trashcontainer: { alignItems: "flex-end", flex: 1 },
 });
 
-export default List;
+export default Pending;

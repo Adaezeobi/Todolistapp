@@ -7,15 +7,23 @@ import {
   View,
   FlatList,
   Text,
+  Dimensions,
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
 
-const CategoryList = ({ navigation, title, result }) => {
+const Completed = ({ navigation, title, result, style }) => {
   const { toDo, completedtoDO, deleteItem } = useContext(ToDoContext);
-
+  const window = Dimensions.get("window");
+  console.log(style);
   return (
-    <View>
+    <View
+      style={
+        style
+          ? { top: window.height, bottom: window.height }
+          : { top: 0, bottom: 0 }
+      }
+    >
       <Text style={styles.titlelabel}>{result.length === 0 ? "" : title}</Text>
       <FlatList
         data={result}
@@ -27,9 +35,7 @@ const CategoryList = ({ navigation, title, result }) => {
                 <View style={styles.itemcontainer}>
                   <TouchableOpacity
                     onPress={() => {
-                      completedtoDO(item.id); //, console.log(item);
-                      //setIcon();
-                      //console.log(item.id);
+                      completedtoDO(item.id);
                     }}
                   >
                     <Entypo name={item.icon} size={24} color="black" />
@@ -68,7 +74,7 @@ const styles = StyleSheet.create({
   rendercontainer: {
     flexDirection: "row",
     marginBottom: 10,
-    //borderWidth: 3,
+
     alignItems: "flex-end",
   },
   itemcontainer: {
@@ -80,4 +86,4 @@ const styles = StyleSheet.create({
   trashcontainer: { alignItems: "flex-end", flex: 1 },
 });
 
-export default CategoryList;
+export default Completed;
